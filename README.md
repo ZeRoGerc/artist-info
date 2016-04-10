@@ -1,2 +1,2 @@
 # artist-info
-Project for Yandex summer school
+Application for showing information about famous artists.
