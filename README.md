@@ -1,2 +1,2 @@
 # artist-info
-Project for Yandex summer school
+Main branch for development
