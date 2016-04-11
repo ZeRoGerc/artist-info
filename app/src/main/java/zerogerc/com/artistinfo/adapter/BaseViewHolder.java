@@ -1,6 +1,7 @@
 package zerogerc.com.artistinfo.adapter;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,10 @@ public abstract class BaseViewHolder<T> extends RecyclerView.ViewHolder {
     public abstract void refresh(final T item);
 
     public static BaseViewHolder getViewHolderByType(Activity activity, ViewGroup parent, int viewType) {
-        return new ViewHolderArtist(activity, parent);
+        if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            return new ArtistViewHolderList(activity, parent);
+        } else {
+            return new ArtistViewHolderGrid(activity, parent);
+        }
     }
 }

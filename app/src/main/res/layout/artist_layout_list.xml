@@ -3,13 +3,15 @@
     android:orientation="horizontal" android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <zerogerc.com.artistinfo.SquareImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/artist_image"
         android:contentDescription="Image of view"
         android:src="@mipmap/ic_launcher"
         android:layout_margin="8dp"
+        android:scaleType="fitStart"
+        android:adjustViewBounds="true"
         />
 
     <TextView
