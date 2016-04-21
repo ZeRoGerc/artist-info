@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import zerogerc.com.artistinfo.database.ArtistReaderContract;
+
 public class FullArtistInfoActivity extends AppCompatActivity {
     public static final String ARTIST_KEY = "Artist";
     private Artist artist;
@@ -23,6 +25,13 @@ public class FullArtistInfoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         artist = intent.getParcelableExtra(ARTIST_KEY);
+
+        ArtistReaderContract.ArtistReaderDbHelper helper = new ArtistReaderContract.ArtistReaderDbHelper(getApplicationContext());
+        if (artist.getName().equals("Usher")) {
+            helper.insertArtistRecent(artist);
+        } else {
+            helper.insertArtistFavourites(artist);
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(artist.getName());

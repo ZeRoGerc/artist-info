@@ -8,12 +8,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
 
 import zerogerc.com.artistinfo.adapter.BaseAdapter;
+import zerogerc.com.artistinfo.database.ArtistReaderContract;
 
 public class ArtistListActivity extends AppCompatActivity {
     private static final String ARTISTS_LIST_KEY = "ARTISTS";
@@ -117,13 +119,19 @@ public class ArtistListActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        //TODO: this is for testing only
+        ArtistReaderContract.ArtistReaderDbHelper helper = new ArtistReaderContract.ArtistReaderDbHelper(getApplicationContext());
         if (id == R.id.action_favourites) {
+            for (Artist artist : helper.getArtists(ArtistReaderContract.REQUEST_TYPE_FAVOURITES)) {
+                Log.d("ARTISTS_LIST", artist.getName() + " " + artist.getLink());
+            }
         }
 
         if (id == R.id.action_recent) {
+            for (Artist artist : helper.getArtists(ArtistReaderContract.REQUEST_TYPE_RECENT)) {
+                Log.d("ARTISTS_LIST", artist.getName() + " " + artist.getLink());
+            }
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
