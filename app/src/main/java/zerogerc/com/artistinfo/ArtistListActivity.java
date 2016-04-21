@@ -32,6 +32,10 @@ public class ArtistListActivity extends AppCompatActivity {
         }
 
         recyclerView = ((RecyclerView) findViewById(R.id.artists_recycler_view));
+        if (recyclerView == null) {
+            return;
+        }
+
         recyclerView.setHasFixedSize(true);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -41,7 +45,6 @@ public class ArtistListActivity extends AppCompatActivity {
         BaseAdapter<Artist> adapter = new BaseAdapter<>(this, artistList);
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
         if (loaded) {
             restoreLoadTask();
             if (loadTask != null) {
