@@ -2,10 +2,6 @@ package zerogerc.com.artistinfo;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,9 +15,10 @@ import java.util.ArrayList;
 
 import zerogerc.com.artistinfo.adapter.BaseAdapter;
 
-public class ArtistListActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class ArtistListActivity extends AppCompatActivity {
     private static final String ARTISTS_LIST_KEY = "ARTISTS";
+    private static final String BUNDLE_RECYCLER_LAYOUT = "recycler_view_state";
+    private static final int LANDSCAPE_COLUMNS_COUNT = 3;
 
     private RecyclerView recyclerView;
     private ArrayList<Artist> artistList;
@@ -37,7 +34,7 @@ public class ArtistListActivity extends AppCompatActivity
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
         } else {
-            recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+            recyclerView.setLayoutManager(new StaggeredGridLayoutManager(LANDSCAPE_COLUMNS_COUNT, StaggeredGridLayoutManager.VERTICAL));
         }
         BaseAdapter<Artist> adapter = new BaseAdapter<>(this, artistList);
         recyclerView.setAdapter(adapter);
@@ -69,30 +66,21 @@ public class ArtistListActivity extends AppCompatActivity
         }
     }
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_artist_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
             initRecyclerView(false);
         } else {
             artistList = savedInstanceState.getParcelableArrayList(ARTISTS_LIST_KEY);
             initRecyclerView(true);
+
+            int position = savedInstanceState.getInt(BUNDLE_RECYCLER_LAYOUT);
+            recyclerView.getLayoutManager().scrollToPosition(position);
         }
     }
 
@@ -102,22 +90,23 @@ public class ArtistListActivity extends AppCompatActivity
         if (artistList != null) {
             outState.putParcelableArrayList(ARTISTS_LIST_KEY, artistList);
         }
-    }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        int position;
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            position = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
         } else {
-            super.onBackPressed();
+            int[] positions = new int[LANDSCAPE_COLUMNS_COUNT];
+            ((StaggeredGridLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPositions(positions);
+            position = positions[0];
         }
+        outState.putInt(BUNDLE_RECYCLER_LAYOUT, position);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.artist_list, menu);
+        getMenuInflater().inflate(R.menu.menu_artist_list, menu);
         return true;
     }
 
@@ -129,35 +118,12 @@ public class ArtistListActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_favourites) {
+        }
+
+        if (id == R.id.action_recent) {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camara) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 }

@@ -1,7 +1,6 @@
 package zerogerc.com.artistinfo.adapter;
 
 import android.app.Activity;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -22,12 +21,7 @@ public class ArtistViewHolderGrid extends ArtistViewHolder {
 
     @Override
     public void refresh(Artist item) {
-        if (artistName != null) {
-            artistName.setText(item.getName());
-        }
-        if (artistGenres != null) {
-            artistGenres.setText(TextUtils.join(", ", item.getGenres().toArray()));
-        }
+        super.refresh(item);
         if (artistImage != null) {
             Picasso.with(activity)
                     .load(item.getSmallPicAddress())

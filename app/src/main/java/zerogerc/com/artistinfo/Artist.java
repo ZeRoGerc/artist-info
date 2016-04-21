@@ -3,6 +3,7 @@ package zerogerc.com.artistinfo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import zerogerc.com.artistinfo.adapter.Item;
@@ -25,6 +26,7 @@ public class Artist implements Item, Parcelable
     public Artist() {}
 
     public Artist(Parcel source) {
+        this.genres = new ArrayList<>();
         this.id = source.readInt();
         this.name = source.readString();
         source.readStringList(this.genres);

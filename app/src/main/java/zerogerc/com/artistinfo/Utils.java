@@ -28,4 +28,11 @@ public class Utils {
         float scale = context.getResources().getDisplayMetrics().density;
         return ((int)(pixel * scale + 0.5f));
     }
+
+    public static String getTrackAlbumsString(Context context, Artist artist) {
+        final String tracks = Integer.toString(artist.getTracks()) + " " + context.getString(R.string.tracks);
+        final String albums = Integer.toString(artist.getAlbums()) + " " + context.getString(R.string.albums);
+
+        return tracks + " \u2022 " + albums;
+    }
 }
