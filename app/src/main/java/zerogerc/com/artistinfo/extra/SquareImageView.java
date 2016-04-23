@@ -1,4 +1,4 @@
-package zerogerc.com.artistinfo;
+package zerogerc.com.artistinfo.extra;
 
 import android.content.Context;
 import android.util.AttributeSet;

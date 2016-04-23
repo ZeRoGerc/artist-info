@@ -1,11 +1,18 @@
 <resources>
     <string name="app_name">Artist Info</string>
+    <string name="activity_favourites_title">Favourites</string>
+    <string name="activity_recent_title">Recent</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <!--Activity FullArtistInfo-->
     <string name="title_activity_full_artist_info">FullArtistInfoActivity</string>
+    <string name="fab_action_database_delete">Deleted from favourites</string>
+    <string name="fab_action_database_insert">Added to favourites</string>
+    <!--End of activity FullArtistInfo-->
 
     <string name="tracks">tracks</string>
     <string name="albums">albums</string>

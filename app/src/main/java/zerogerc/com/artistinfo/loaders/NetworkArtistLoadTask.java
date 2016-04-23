@@ -1,8 +1,6 @@
-package zerogerc.com.artistinfo;
+package zerogerc.com.artistinfo.loaders;
 
-import android.os.AsyncTask;
 import android.util.JsonReader;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,25 +9,21 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import zerogerc.com.artistinfo.adapter.BaseAdapter;
+import zerogerc.com.artistinfo.Artist;
 
 /**
- * Created by ZeRoGerc on 11/04/16.
+ * Provide loading of artists from network.
+ * Load data from <code>http://cache-spb04.cdn.yandex.net/download.cdn.yandex.net/mobilization-2016/artists.json</code>
  */
-public class ArtistsLoadTask extends AsyncTask<Void, Artist, List<Artist>> {
-    public static final  String LOG_TAG = "ArtistLoadTask";
-
-    private BaseAdapter<? super Artist> adapter;
-
-    public ArtistsLoadTask() {}
-
-    public List<Artist> loadArtists() {
+public class NetworkArtistLoadTask extends ArtistsLoadTask {
+    protected Boolean loadArtists() {
         InputStream inputStream = null;
         try {
             inputStream = new URL("http://cache-spb04.cdn.yandex.net/download.cdn.yandex.net/mobilization-2016/artists.json").openStream();
             JsonReader reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
+            readArtistsList(reader);
 
-            return readArtistsList(reader);
+            return true;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -44,23 +38,15 @@ public class ArtistsLoadTask extends AsyncTask<Void, Artist, List<Artist>> {
             }
         }
 
-        return new ArrayList<>();
+        return false;
     }
 
-    private List<Artist> readArtistsList(final JsonReader reader) throws IOException {
-        final List<Artist> artists = new ArrayList<>();
+    private void readArtistsList(final JsonReader reader) throws IOException {
         reader.beginArray();
         while (reader.hasNext()) {
-            artists.add(readArtist(reader));
-            publishProgress(artists.get(artists.size() - 1));
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+            publishProgress(readArtist(reader));
         }
         reader.endArray();
-        return artists;
     }
 
     private Artist readArtist(final JsonReader reader) throws IOException {
@@ -127,29 +113,5 @@ public class ArtistsLoadTask extends AsyncTask<Void, Artist, List<Artist>> {
             }
         }
         reader.endObject();
-    }
-
-    @Override
-    protected List<Artist> doInBackground(Void... params) {
-        return loadArtists();
-    }
-
-    @Override
-    protected void onProgressUpdate(Artist... values) {
-        super.onProgressUpdate(values);
-        if (adapter != null) {
-            adapter.append(values[0]);
-        } else {
-            Log.e(LOG_TAG, "Null adapter");
-        }
-    }
-
-    @Override
-    protected void onPostExecute(List<Artist> artists) {
-        super.onPostExecute(artists);
-    }
-
-    public void setAdapter(BaseAdapter<? super Artist> adapter) {
-        this.adapter = adapter;
     }
 }

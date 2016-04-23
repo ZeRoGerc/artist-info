@@ -6,7 +6,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_full_artist_info" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="zerogerc.com.artistinfo.FullArtistInfoActivity">
+    tools:context="zerogerc.com.artistinfo.activities.FullArtistInfoActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

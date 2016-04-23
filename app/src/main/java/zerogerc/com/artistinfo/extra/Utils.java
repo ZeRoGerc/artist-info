@@ -1,8 +1,11 @@
-package zerogerc.com.artistinfo;
+package zerogerc.com.artistinfo.extra;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+
+import zerogerc.com.artistinfo.Artist;
+import zerogerc.com.artistinfo.R;
 
 /**
  * Created by ZeRoGerc on 11/04/16.

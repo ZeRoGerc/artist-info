@@ -8,10 +8,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import zerogerc.com.artistinfo.Artist;
-import zerogerc.com.artistinfo.FullArtistInfoActivity;
+import zerogerc.com.artistinfo.activities.FullArtistInfoActivity;
 import zerogerc.com.artistinfo.R;
-import zerogerc.com.artistinfo.SquareImageView;
-import zerogerc.com.artistinfo.Utils;
+import zerogerc.com.artistinfo.extra.SquareImageView;
+import zerogerc.com.artistinfo.extra.Utils;
 
 /**
  * Created by ZeRoGerc on 11/04/16.

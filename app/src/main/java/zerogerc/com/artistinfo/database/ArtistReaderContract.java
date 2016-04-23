@@ -15,11 +15,14 @@ import java.util.List;
 import zerogerc.com.artistinfo.Artist;
 
 /**
- * Created by ZeRoGerc on 22/04/16.
+ * Class for easy work with database which stores recent and favourites artist lists.
  */
 public final class ArtistReaderContract {
     public ArtistReaderContract() {}
 
+    /**
+     * One entry of database. All fields is for creating entry from {@link Artist}
+     */
     public static abstract class ArtistEntry implements BaseColumns {
         public static final String TABLE_NAME = "entry";
 
@@ -61,9 +64,15 @@ public final class ArtistReaderContract {
 
 
     /**
-     * Available types of column {@link zerogerc.com.artistinfo.database.ArtistReaderContract.ArtistEntry#COLUMN_NAME_REQUEST_TYPE}.
+     * Available type of column {@link zerogerc.com.artistinfo.database.ArtistReaderContract.ArtistEntry#COLUMN_NAME_REQUEST_TYPE}.
+     * If you use this key you will work with list of favourite artists.
      */
     public static final String REQUEST_TYPE_FAVOURITES = "favourites";
+
+    /**
+     * Available type of column {@link zerogerc.com.artistinfo.database.ArtistReaderContract.ArtistEntry#COLUMN_NAME_REQUEST_TYPE}.
+     * If you use this key you will work with list of recent artists.
+     */
     public static final String REQUEST_TYPE_RECENT = "recent";
 
 
@@ -76,21 +85,23 @@ public final class ArtistReaderContract {
         }
 
         @Override
-        public void onCreate(SQLiteDatabase db) {
+        public void onCreate(final SQLiteDatabase db) {
             db.execSQL(SQL_CREATE_ENTRIES);
         }
 
+        /**
+         * Upgrades given database from <code>oldVersion</code> to <code>newVersion</code>
+         * @param db given database
+         * @param oldVersion - old version
+         * @param newVersion - new version
+         */
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        public void onUpgrade(final SQLiteDatabase db, int oldVersion, int newVersion) {
             db.execSQL(SQL_DELETE_ENTRIES);
             onCreate(db);
         }
 
-        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            onUpgrade(db, oldVersion, newVersion);
-        }
-
-        private ContentValues getContentValues(Artist artist) {
+        private ContentValues getContentValues(final Artist artist) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(ArtistEntry.COLUMN_NAME_ID, artist.getId());
             contentValues.put(ArtistEntry.COLUMN_NAME_ARTIST, artist.getName());
@@ -104,21 +115,25 @@ public final class ArtistReaderContract {
             return contentValues;
         }
 
-        public long insertArtistFavourites(Artist artist) {
+        /**
+         * Insert given artist in database.
+         * @param artist given artist
+         * @param requestType type of request. Can be either {@link #REQUEST_TYPE_FAVOURITES} or {@link #REQUEST_TYPE_RECENT}
+         * @return
+         */
+        public long insertArtist(final Artist artist, final String requestType) {
             SQLiteDatabase db = getWritableDatabase();
             ContentValues contentValues = getContentValues(artist);
-            contentValues.put(ArtistEntry.COLUMN_NAME_REQUEST_TYPE, REQUEST_TYPE_FAVOURITES);
+            contentValues.put(ArtistEntry.COLUMN_NAME_REQUEST_TYPE, requestType);
             return db.insert(ArtistEntry.TABLE_NAME, null, contentValues);
         }
 
-        public long insertArtistRecent(Artist artist) {
-            SQLiteDatabase db = getWritableDatabase();
-            ContentValues contentValues = getContentValues(artist);
-            contentValues.put(ArtistEntry.COLUMN_NAME_REQUEST_TYPE, REQUEST_TYPE_RECENT);
-            return db.insert(ArtistEntry.TABLE_NAME, null, contentValues);
-        }
-
-        private Cursor getCursorWithType(final String requestType) {
+        /**
+         * Get cursor to proper either favourites or recent.
+         * @param requestType type of list. Can be either {@link #REQUEST_TYPE_RECENT} or {@link #REQUEST_TYPE_FAVOURITES}
+         * @return cursor to given list
+         */
+        public Cursor getCursorWithType(final String requestType) {
             SQLiteDatabase db = getReadableDatabase();
 
             String[] args = {requestType};
@@ -135,7 +150,7 @@ public final class ArtistReaderContract {
 
         /**
          * Retrieve list of artist from database.
-         * @param requestType type of request(can be either {@link #REQUEST_TYPE_FAVOURITES} or {@link #REQUEST_TYPE_RECENT})
+         * @param requestType type of request. Can be either {@link #REQUEST_TYPE_FAVOURITES} or {@link #REQUEST_TYPE_RECENT})
          * @return list of retrieved artists
          */
         public List<Artist> getArtists(final String requestType) {
@@ -150,11 +165,11 @@ public final class ArtistReaderContract {
             return artists;
         }
 
-        private String packList(List<String> list) {
+        private String packList(final List<String> list) {
             return TextUtils.join(",", list);
         }
 
-        private List<String> unpackList(String pack) {
+        private List<String> unpackList(final String pack) {
             return Arrays.asList(TextUtils.split(pack, ","));
         }
 
@@ -168,7 +183,12 @@ public final class ArtistReaderContract {
             return cursor.getInt(id);
         }
 
-        private Artist getArtist(final Cursor cursor) {
+        /**
+         * Get artist which given current cursor points to.
+         * @param cursor given cursor
+         * @return artist which given cursor points to.
+         */
+        public Artist getArtist(final Cursor cursor) {
             Artist artist = new Artist();
             artist.setId(getInt(cursor, ArtistEntry.COLUMN_NAME_ID));
             artist.setName(getString(cursor, ArtistEntry.COLUMN_NAME_ARTIST));
@@ -180,6 +200,44 @@ public final class ArtistReaderContract {
             artist.setSmallPicAddress(getString(cursor, ArtistEntry.COLUMN_NAME_SMALLPIC));
             artist.setBigPicAddress(getString(cursor, ArtistEntry.COLUMN_NAME_BIGPIC));
             return artist;
+        }
+
+        /**
+         * Check if given artist is in database.
+         * @param artist given artist
+         * @param requestType type of database to find artist in. Can be either {@link #REQUEST_TYPE_FAVOURITES} or {@link #REQUEST_TYPE_RECENT}
+         * @return true if artist is in database
+         */
+        public boolean hasArtist(final Artist artist, final String requestType) {
+            SQLiteDatabase db = getReadableDatabase();
+
+            String[] args = {requestType, artist.getName()};
+
+            Cursor c =  db.query(ArtistEntry.TABLE_NAME,
+                    null,
+                    ArtistEntry.COLUMN_NAME_REQUEST_TYPE + "=?" + " AND " + ArtistEntry.COLUMN_NAME_ARTIST + "=?",
+                    args,
+                    null,
+                    null,
+                    ArtistEntry.COLUMN_NAME_ARTIST + " ASC"
+            );
+
+            return c != null && c.moveToFirst();
+        }
+
+        /**
+         * Delete entry of given artist from one of lists.
+         * @param artist given artist
+         * @param requestType type of list to delete artist from. Can be either {@link #REQUEST_TYPE_FAVOURITES} or {@link #REQUEST_TYPE_RECENT}
+         * @return true if artist was deleted
+         */
+        public boolean deleteArtist(final Artist artist, final String requestType) {
+            SQLiteDatabase db = getWritableDatabase();
+            final String selection = ArtistEntry.COLUMN_NAME_ARTIST + "=?" + " AND " +
+                    ArtistEntry.COLUMN_NAME_REQUEST_TYPE + "=?";
+            final String[] selectionArgs = {artist.getName(), requestType};
+
+            return db.delete(ArtistEntry.TABLE_NAME, selection, selectionArgs) > 0;
         }
     }
 }

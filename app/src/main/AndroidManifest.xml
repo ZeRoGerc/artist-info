@@ -12,25 +12,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ArtistListActivity"
+            android:name=".activities.ArtistListActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".FullArtistInfoActivity"
+            android:name=".activities.FullArtistInfoActivity"
             android:label="@string/title_activity_full_artist_info"
-            android:parentActivityName=".ArtistListActivity"
             android:theme="@style/AppTheme.NoActionBar" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ArtistListActivity" />
         </activity>
 
+        <activity android:name=".activities.DatabaseRequestActivity"
+            android:parentActivityName=".activities.ArtistListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.ArtistListActivity" />
+        </activity>
     </application>
 
 </manifest>

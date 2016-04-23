@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white">
 
-        <zerogerc.com.artistinfo.SquareImageView
+        <zerogerc.com.artistinfo.extra.SquareImageView
             android:layout_width="144dp"
             android:layout_height="144dp"
             android:id="@+id/artist_image"

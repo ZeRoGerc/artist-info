@@ -10,7 +10,7 @@ import android.view.animation.DecelerateInterpolator;
 
 import java.util.List;
 
-import zerogerc.com.artistinfo.Utils;
+import zerogerc.com.artistinfo.extra.Utils;
 
 /**
  * Created by ZeRoGerc on 25.12.15.
@@ -88,5 +88,9 @@ public class BaseAdapter<T extends Item> extends RecyclerView.Adapter<BaseViewHo
             animator.start();
             lastPosition = position;
         }
+    }
+
+    public void attachTolist(final List<T> list) {
+        this.items = list;
     }
 }
