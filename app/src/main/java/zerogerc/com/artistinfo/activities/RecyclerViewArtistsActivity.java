@@ -12,7 +12,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import java.util.ArrayList;
 
 import zerogerc.com.artistinfo.Artist;
-import zerogerc.com.artistinfo.adapter.BaseAdapter;
+import zerogerc.com.artistinfo.adapter.ArtistAdapter;
 import zerogerc.com.artistinfo.loaders.ArtistsLoadTask;
 
 /**
@@ -27,7 +27,7 @@ public abstract class RecyclerViewArtistsActivity extends AppCompatActivity {
     private static final int LANDSCAPE_COLUMNS_COUNT = 3;
 
     protected RecyclerView recyclerView;
-    protected BaseAdapter<Artist> adapter;
+    protected ArtistAdapter adapter;
     protected ArrayList<Artist> artistList;
 
     private ArtistsLoadTask loadTask;
@@ -120,7 +120,7 @@ public abstract class RecyclerViewArtistsActivity extends AppCompatActivity {
         } else {
             recyclerView.setLayoutManager(new StaggeredGridLayoutManager(LANDSCAPE_COLUMNS_COUNT, StaggeredGridLayoutManager.VERTICAL));
         }
-        adapter = new BaseAdapter<>(this, artistList);
+        adapter = new ArtistAdapter(this, artistList);
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         if (loaded) {

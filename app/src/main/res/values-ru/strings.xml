@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Популярные Исполнители</string>
+    <string name="main_activity_title">Популярные исполнители</string>
+    <string name="activity_favourites_title">Избранные</string>
+    <string name="activity_recent_title">Недавние</string>
+
+    <!--Activity FullArtistInfo-->
+    <string name="fab_action_database_delete">Удалено из избранного</string>
+    <string name="fab_action_database_insert">Добавлено в избранное</string>
+    <!--End of activity FullArtistInfo-->
+
+    <string name="tracks">песен</string>
+    <string name="albums">альбомов</string>
+    <string name="biography">Биография</string>
+
+    <string name="favourites">Избранные</string>
+    <string name="recent">Недавние</string>
+
+    <string name="refresh">Проверьте интернет соединение и попытайтесь снова</string>
+    <string name="web_view_fail">Ошибка при загрузке страницы</string>
+</resources>

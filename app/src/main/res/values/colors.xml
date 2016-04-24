@@ -5,4 +5,5 @@
     <color name="colorAccent">#68EFAD</color>
     <color name="colorTextHeader">#455A64</color>
     <color name="colorTextSecondary">#90A4AE</color>
+    <color name="link_color">#7C4DFF</color>
 </resources>

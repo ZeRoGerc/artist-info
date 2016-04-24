@@ -10,44 +10,39 @@ import android.view.animation.DecelerateInterpolator;
 
 import java.util.List;
 
+import zerogerc.com.artistinfo.Artist;
 import zerogerc.com.artistinfo.extra.Utils;
 
-/**
- * Created by ZeRoGerc on 25.12.15.
- * ITMO University
- */
-
 
 /**
- * Base class for adapters
- * No special actions
- * No animations
- *
- * @param <T> objects adapter is handling
+ * Adaptor for {@link ArtistViewHolder}.
  */
-public class BaseAdapter<T extends Item> extends RecyclerView.Adapter<BaseViewHolder> {
-    protected List<T> items;
+public class ArtistAdapter extends RecyclerView.Adapter<ArtistViewHolder> {
+    protected List<Artist> items;
     protected Activity activity;
 
+    //For animations
     private int lastPosition = -1;
 
-    public BaseAdapter(Activity activity, List<T> items) {
+    public ArtistAdapter(Activity activity, List<Artist> items) {
         this.items = items;
         this.activity = activity;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).getType();
+        //Always return same value because of single type
+        return 0;
     }
 
     @Override
-    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return BaseViewHolder.getViewHolderByType(activity, parent, viewType);
+    public ArtistViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        //We show only one type of content so just return this view holder
+        return new ArtistViewHolder(activity, parent);
     }
 
     @Override
-    public void onBindViewHolder(BaseViewHolder holder, int position) {
+    public void onBindViewHolder(ArtistViewHolder holder, int position) {
         holder.refresh(items.get(position));
         setItemsAppearingAnimation(holder.itemView, position);
     }
@@ -57,9 +52,23 @@ public class BaseAdapter<T extends Item> extends RecyclerView.Adapter<BaseViewHo
         return items.size();
     }
 
-    public void append(T item) {
-        items.add(item);
+    /**
+     * Append given artist in the end of the list.
+     * Changes will be shown on UI.
+     * @param artist given artist
+     */
+    public void append(Artist artist) {
+        items.add(artist);
         notifyItemInserted(items.size() - 1);
+    }
+
+
+    /**
+     * Attach this adapter to given list.
+     * @param list given list
+     */
+    public void attachTolist(final List<Artist> list) {
+        this.items = list;
     }
 
     private void setItemsAppearingAnimation(View viewToAnimate, int position) {
@@ -83,14 +92,8 @@ public class BaseAdapter<T extends Item> extends RecyclerView.Adapter<BaseViewHo
                 animator.setDuration(500);
             }
             animator.setInterpolator(new DecelerateInterpolator());
-//            Animation animation = AnimationUtils.loadAnimation(activity, android.R.anim.slide_in_left);
-//            viewToAnimate.startAnimation(animation);
             animator.start();
             lastPosition = position;
         }
-    }
-
-    public void attachTolist(final List<T> list) {
-        this.items = list;
     }
 }

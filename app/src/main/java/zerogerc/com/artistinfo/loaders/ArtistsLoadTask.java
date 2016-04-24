@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import zerogerc.com.artistinfo.Artist;
-import zerogerc.com.artistinfo.adapter.BaseAdapter;
+import zerogerc.com.artistinfo.adapter.ArtistAdapter;
 
 /**
  * Base task for loading artist. Provide artists one by one in <code>onProgressUpdate</code>
@@ -13,10 +13,14 @@ import zerogerc.com.artistinfo.adapter.BaseAdapter;
 public abstract class ArtistsLoadTask extends AsyncTask<Void, Artist, Boolean> {
     public static final  String LOG_TAG = "ArtistLoadTask";
 
-    private BaseAdapter<? super Artist> adapter;
+    private ArtistAdapter adapter;
 
     public ArtistsLoadTask() {}
 
+    /**
+     * Method for loading artist in background. Should invoke {@link #onProgressUpdate(Artist...)} to pass artists one by one.
+     * @return true if loading not succeed
+     */
     protected abstract Boolean loadArtists();
 
     @Override
@@ -35,7 +39,11 @@ public abstract class ArtistsLoadTask extends AsyncTask<Void, Artist, Boolean> {
         }
     }
 
-    public void setAdapter(BaseAdapter<? super Artist> adapter) {
+    /**
+     * Sets adapter to notify when new artist appears
+     * @param adapter adapter for notifying
+     */
+    public void setAdapter(ArtistAdapter adapter) {
         this.adapter = adapter;
     }
 }

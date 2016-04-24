@@ -10,10 +10,9 @@
         android:background="@android:color/white">
 
         <zerogerc.com.artistinfo.extra.SquareImageView
-            android:layout_width="144dp"
-            android:layout_height="144dp"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
             android:id="@+id/artist_image"
-            android:contentDescription="Image of view"
             android:background="@android:color/darker_gray"
             android:scaleType="fitStart"
             android:adjustViewBounds="true"
@@ -45,7 +44,8 @@
             android:id="@+id/artist_tracks"
             android:layout_alignParentBottom="true"
             android:layout_toEndOf="@id/artist_image"
-            android:layout_margin="4dp"/>
+            android:layout_margin="4dp"
+            android:translationY="-4dp"/>
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

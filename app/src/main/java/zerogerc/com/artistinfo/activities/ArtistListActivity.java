@@ -5,12 +5,16 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import zerogerc.com.artistinfo.R;
 import zerogerc.com.artistinfo.database.ArtistReaderContract;
 import zerogerc.com.artistinfo.loaders.ArtistsLoadTask;
 import zerogerc.com.artistinfo.loaders.NetworkArtistLoadTask;
 
+/**
+ * Main Activity for showing all artists on the {@link android.support.v7.widget.RecyclerView}.
+ */
 public class ArtistListActivity extends RecyclerViewArtistsActivity {
     @Override
     protected int getContentId() {
@@ -22,9 +26,45 @@ public class ArtistListActivity extends RecyclerViewArtistsActivity {
         return R.id.artists_recycler_view;
     }
 
+    /**
+     * Creates task that load data from internet.
+     * Additionally it shows refresh button if error during load occurred.
+     * @return created task
+     */
     @Override
     protected ArtistsLoadTask createArtistLoadTask() {
-        return new NetworkArtistLoadTask();
+        return new NetworkArtistLoadTask() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                View v = findViewById(R.id.artists_recycler_view);
+                if (v != null) {
+                    v.bringToFront();
+                }
+                v = findViewById(R.id.refresh_layout);
+                if (v != null) {
+                    v.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if (!aBoolean) {
+                    View v = findViewById(R.id.refresh_layout);
+                    if (v != null) {
+                        v.setVisibility(View.VISIBLE);
+                        v.bringToFront();
+                        v.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                startLoad();
+                            }
+                        });
+                    }
+                }
+            }
+        };
     }
 
     @Override
@@ -40,7 +80,6 @@ public class ArtistListActivity extends RecyclerViewArtistsActivity {
 
     @Override
     public void onBackPressed() {
-        //If now activity showing the list of favourites or recent we just switch to full artist list.
         super.onBackPressed();
     }
 
@@ -69,25 +108,4 @@ public class ArtistListActivity extends RecyclerViewArtistsActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * Switch list of artists.
-     * @param type type of content. Can be {@link ArtistReaderContract#REQUEST_TYPE_FAVOURITES},
-     * {@link ArtistReaderContract#REQUEST_TYPE_RECENT} or <code>null</code>. If param is null activity starts showing all artists.
-     */
-//    private void switchArtistsList(final String type) {
-//        if (type != null && (type.equals(ArtistReaderContract.REQUEST_TYPE_FAVOURITES) || type.equals(ArtistReaderContract.REQUEST_TYPE_RECENT))) {
-//            //Here we assume that activity can't make rotation during this task because it's very fast task
-//            final DatabaseArtistLoadTask loader = new DatabaseArtistLoadTask(getApplicationContext(), type);
-//
-//            currentArtists = new ArrayList<>();
-//            adapter.attachTolist(currentArtists);
-//            loader.setAdapter(adapter);
-//            loader.execute();
-//        } else {
-//            currentArtists = artistList;
-//            adapter.attachTolist(currentArtists);
-//        }
-//        recyclerView.getAdapter().notifyDataSetChanged();
-//    }
 }

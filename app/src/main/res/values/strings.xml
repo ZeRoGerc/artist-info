@@ -1,12 +1,8 @@
 <resources>
-    <string name="app_name">Artist Info</string>
+    <string name="app_name">Popular Artists</string>
+    <string name="main_activity_title">Popular artists</string>
     <string name="activity_favourites_title">Favourites</string>
     <string name="activity_recent_title">Recent</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
 
     <!--Activity FullArtistInfo-->
     <string name="title_activity_full_artist_info">FullArtistInfoActivity</string>
@@ -20,4 +16,7 @@
 
     <string name="favourites">Favourites</string>
     <string name="recent">Recent</string>
+
+    <string name="refresh">You have no internet connection. Please try again</string>
+    <string name="web_view_fail">Error loading page</string>
 </resources>

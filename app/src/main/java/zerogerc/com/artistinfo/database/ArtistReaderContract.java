@@ -8,9 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import zerogerc.com.artistinfo.Artist;
 
@@ -27,6 +29,7 @@ public final class ArtistReaderContract {
         public static final String TABLE_NAME = "entry";
 
         public static final String COLUMN_NAME_REQUEST_TYPE = "request";
+        public static final String COLUMN_NAME_TIMESTAMP = "timestamp";
 
         public static final String COLUMN_NAME_ID = "id";
         public static final String COLUMN_NAME_ARTIST = "artist";
@@ -42,12 +45,14 @@ public final class ArtistReaderContract {
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String INT_TYPE = " INTEGER";
+    private static final String TIMESTAMP_TYPE = " TIMESTAMP";
     private static final String COMMA_SEP = ",";
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + ArtistEntry.TABLE_NAME + " (" +
                     ArtistEntry._ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
                     ArtistEntry.COLUMN_NAME_REQUEST_TYPE + TEXT_TYPE + COMMA_SEP +
+                    ArtistEntry.COLUMN_NAME_TIMESTAMP + TIMESTAMP_TYPE + COMMA_SEP +
                     ArtistEntry.COLUMN_NAME_ID + INT_TYPE + COMMA_SEP +
                     ArtistEntry.COLUMN_NAME_ARTIST + TEXT_TYPE + COMMA_SEP +
                     ArtistEntry.COLUMN_NAME_GENRES + TEXT_TYPE + COMMA_SEP +
@@ -75,6 +80,8 @@ public final class ArtistReaderContract {
      */
     public static final String REQUEST_TYPE_RECENT = "recent";
 
+    public static final String SORT_ORDER_NAME_ACS = ArtistEntry.COLUMN_NAME_ARTIST + " ASC";
+    public static final String SORT_ORDER_TIMESTAMP_ASC = ArtistEntry.COLUMN_NAME_TIMESTAMP + " DESC";
 
     public static class ArtistReaderDbHelper extends SQLiteOpenHelper {
         public static final int DATABASE_VERSION = 1;
@@ -101,9 +108,11 @@ public final class ArtistReaderContract {
             onCreate(db);
         }
 
-        private ContentValues getContentValues(final Artist artist) {
+        private ContentValues getContentValues(final Artist artist, final String requestType) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(ArtistEntry.COLUMN_NAME_ID, artist.getId());
+            contentValues.put(ArtistEntry.COLUMN_NAME_REQUEST_TYPE, requestType);
+            contentValues.put(ArtistEntry.COLUMN_NAME_TIMESTAMP, getCurrentTimestamp());
             contentValues.put(ArtistEntry.COLUMN_NAME_ARTIST, artist.getName());
             contentValues.put(ArtistEntry.COLUMN_NAME_GENRES, packList(artist.getGenres()));
             contentValues.put(ArtistEntry.COLUMN_NAME_TRACKS, artist.getTracks());
@@ -115,25 +124,39 @@ public final class ArtistReaderContract {
             return contentValues;
         }
 
+        private String getCurrentTimestamp() {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Date date = new Date();
+            return dateFormat.format(date);
+        }
+
+
         /**
-         * Insert given artist in database.
+         * Insert given artist in database if it not in database. Otherwise just update <code>TIMESTAMP</code>
          * @param artist given artist
          * @param requestType type of request. Can be either {@link #REQUEST_TYPE_FAVOURITES} or {@link #REQUEST_TYPE_RECENT}
-         * @return
          */
-        public long insertArtist(final Artist artist, final String requestType) {
+        public void updateArtists(final Artist artist, final String requestType) {
             SQLiteDatabase db = getWritableDatabase();
-            ContentValues contentValues = getContentValues(artist);
-            contentValues.put(ArtistEntry.COLUMN_NAME_REQUEST_TYPE, requestType);
-            return db.insert(ArtistEntry.TABLE_NAME, null, contentValues);
+
+            if (hasArtist(artist, requestType)) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(ArtistEntry.COLUMN_NAME_TIMESTAMP, getCurrentTimestamp());
+                String s = ArtistEntry.COLUMN_NAME_REQUEST_TYPE + "=?" + " AND " + ArtistEntry.COLUMN_NAME_ID + "=?";
+                String[] sa = {requestType, Integer.toString(artist.getId())};
+                db.update(ArtistEntry.TABLE_NAME, contentValues, s, sa);
+            } else {
+                db.insert(ArtistEntry.TABLE_NAME, null, getContentValues(artist, requestType));
+            }
         }
 
         /**
          * Get cursor to proper either favourites or recent.
          * @param requestType type of list. Can be either {@link #REQUEST_TYPE_RECENT} or {@link #REQUEST_TYPE_FAVOURITES}
+         * @param sortOrder sort order of resulting list. You can use {@link #SORT_ORDER_NAME_ACS}, {@link #SORT_ORDER_TIMESTAMP_ASC} or provide custom.
          * @return cursor to given list
          */
-        public Cursor getCursorWithType(final String requestType) {
+        public Cursor getCursorWithType(final String requestType, final String sortOrder) {
             SQLiteDatabase db = getReadableDatabase();
 
             String[] args = {requestType};
@@ -144,43 +167,8 @@ public final class ArtistReaderContract {
                     args,
                     null,
                     null,
-                    ArtistEntry.COLUMN_NAME_ARTIST + " ASC"
+                    sortOrder
             );
-        }
-
-        /**
-         * Retrieve list of artist from database.
-         * @param requestType type of request. Can be either {@link #REQUEST_TYPE_FAVOURITES} or {@link #REQUEST_TYPE_RECENT})
-         * @return list of retrieved artists
-         */
-        public List<Artist> getArtists(final String requestType) {
-            Cursor cursor = getCursorWithType(requestType);
-            List<Artist> artists = new ArrayList<>();
-            if (cursor != null && cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-                    artists.add(getArtist(cursor));
-                    cursor.moveToNext();
-                }
-            }
-            return artists;
-        }
-
-        private String packList(final List<String> list) {
-            return TextUtils.join(",", list);
-        }
-
-        private List<String> unpackList(final String pack) {
-            return Arrays.asList(TextUtils.split(pack, ","));
-        }
-
-        private String getString(final Cursor cursor, final String key) {
-            int id = cursor.getColumnIndexOrThrow(key);
-            return cursor.getString(id);
-        }
-
-        private int getInt(final Cursor cursor, final String key) {
-            int id = cursor.getColumnIndexOrThrow(key);
-            return cursor.getInt(id);
         }
 
         /**
@@ -211,15 +199,15 @@ public final class ArtistReaderContract {
         public boolean hasArtist(final Artist artist, final String requestType) {
             SQLiteDatabase db = getReadableDatabase();
 
-            String[] args = {requestType, artist.getName()};
+            String[] args = {requestType, Integer.toString(artist.getId())};
 
             Cursor c =  db.query(ArtistEntry.TABLE_NAME,
                     null,
-                    ArtistEntry.COLUMN_NAME_REQUEST_TYPE + "=?" + " AND " + ArtistEntry.COLUMN_NAME_ARTIST + "=?",
+                    ArtistEntry.COLUMN_NAME_REQUEST_TYPE + "=?" + " AND " + ArtistEntry.COLUMN_NAME_ID + "=?",
                     args,
                     null,
                     null,
-                    ArtistEntry.COLUMN_NAME_ARTIST + " ASC"
+                    null
             );
 
             return c != null && c.moveToFirst();
@@ -233,11 +221,29 @@ public final class ArtistReaderContract {
          */
         public boolean deleteArtist(final Artist artist, final String requestType) {
             SQLiteDatabase db = getWritableDatabase();
-            final String selection = ArtistEntry.COLUMN_NAME_ARTIST + "=?" + " AND " +
-                    ArtistEntry.COLUMN_NAME_REQUEST_TYPE + "=?";
-            final String[] selectionArgs = {artist.getName(), requestType};
+            final String selection = ArtistEntry.COLUMN_NAME_REQUEST_TYPE + "=?" + " AND "
+                    + ArtistEntry.COLUMN_NAME_ID + "=?";
+            final String[] selectionArgs = {requestType, Integer.toString(artist.getId())};
 
             return db.delete(ArtistEntry.TABLE_NAME, selection, selectionArgs) > 0;
+        }
+
+        private String packList(final List<String> list) {
+            return TextUtils.join(",", list);
+        }
+
+        private List<String> unpackList(final String pack) {
+            return Arrays.asList(TextUtils.split(pack, ","));
+        }
+
+        private String getString(final Cursor cursor, final String key) {
+            int id = cursor.getColumnIndexOrThrow(key);
+            return cursor.getString(id);
+        }
+
+        private int getInt(final Cursor cursor, final String key) {
+            int id = cursor.getColumnIndexOrThrow(key);
+            return cursor.getInt(id);
         }
     }
 }

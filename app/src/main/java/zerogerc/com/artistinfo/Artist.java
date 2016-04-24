@@ -6,12 +6,10 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-import zerogerc.com.artistinfo.adapter.Item;
-
 /**
- * Created by ZeRoGerc on 10/04/16.
+ * Base class storing information about artist.
  */
-public class Artist implements Item, Parcelable
+public class Artist implements Parcelable
 {
     private int id;
     private String name;
@@ -108,11 +106,6 @@ public class Artist implements Item, Parcelable
 
     public void setBigPicAddress(String bigPicAddress) {
         this.bigPicAddress = bigPicAddress;
-    }
-
-    @Override
-    public int getType() {
-        return Item.ARTIST;
     }
 
     @Override

@@ -24,7 +24,14 @@ public class DatabaseArtistLoadTask extends ArtistsLoadTask {
     @Override
     protected Boolean loadArtists() {
         final ArtistReaderContract.ArtistReaderDbHelper helper = new ArtistReaderContract.ArtistReaderDbHelper(context);
-        Cursor cursor = helper.getCursorWithType(requestType);
+
+        Cursor cursor;
+        //Different sorting order for different request types
+        if (requestType.equals(ArtistReaderContract.REQUEST_TYPE_FAVOURITES)) {
+            cursor = helper.getCursorWithType(requestType, ArtistReaderContract.SORT_ORDER_NAME_ACS);
+        } else {
+            cursor = helper.getCursorWithType(requestType, ArtistReaderContract.SORT_ORDER_TIMESTAMP_ASC);
+        }
 
         if (cursor != null && cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {

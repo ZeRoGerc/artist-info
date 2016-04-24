@@ -2,58 +2,69 @@ package zerogerc.com.artistinfo.adapter;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.annotation.CallSuper;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import zerogerc.com.artistinfo.Artist;
-import zerogerc.com.artistinfo.activities.FullArtistInfoActivity;
 import zerogerc.com.artistinfo.R;
-import zerogerc.com.artistinfo.extra.SquareImageView;
+import zerogerc.com.artistinfo.activities.FullArtistInfoActivity;
 import zerogerc.com.artistinfo.extra.Utils;
 
 /**
- * Created by ZeRoGerc on 11/04/16.
+ * View holder for showing artist on the {@link RecyclerView}
  */
-public abstract class ArtistViewHolder extends BaseViewHolder<Artist> {
-    protected SquareImageView artistImage;
-    protected TextView artistName;
-    protected TextView artistGenres;
-    protected TextView artistTracks;
-    protected Activity activity;
+public class ArtistViewHolder extends RecyclerView.ViewHolder {
+    private ImageView artistImage;
+    private TextView artistName;
+    private TextView artistGenres;
+    private TextView artistTracks;
+    private Activity activity;
 
 
-    public ArtistViewHolder(Activity activity, View itemView) {
-        super(activity, itemView);
-
+    public ArtistViewHolder(Activity activity, ViewGroup parent) {
+        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_layout, parent, false));
         this.activity = activity;
         artistName = ((TextView) itemView.findViewById(R.id.artist_name));
         artistGenres = ((TextView) itemView.findViewById(R.id.artist_genres));
-        artistImage = ((SquareImageView) itemView.findViewById(R.id.artist_image));
+        artistImage = ((ImageView) itemView.findViewById(R.id.artist_image));
         artistTracks = ((TextView) itemView.findViewById(R.id.artist_tracks));
     }
 
-    @Override
-    @CallSuper
-    public void refresh(final Artist item) {
+    /**
+     * Method loads content of given artist onto this {@link ArtistViewHolder}.
+     * @param artist given artist
+     */
+    public void refresh(final Artist artist) {
         if (artistName != null) {
-            artistName.setText(item.getName());
+            artistName.setText(artist.getName());
         }
         if (artistGenres != null) {
-            artistGenres.setText(TextUtils.join(", ", item.getGenres().toArray()));
+            artistGenres.setText(TextUtils.join(", ", artist.getGenres().toArray()));
         }
         if (artistTracks != null) {
-            artistTracks.setText(Utils.getTrackAlbumsString(activity, item));
+            artistTracks.setText(Utils.getTrackAlbumsString(activity, artist));
         }
 
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, FullArtistInfoActivity.class);
-                intent.putExtra(FullArtistInfoActivity.ARTIST_KEY, item);
+                intent.putExtra(FullArtistInfoActivity.ARTIST_KEY, artist);
                 activity.startActivity(intent);
             }
         });
+
+        if (artistImage != null) {
+            Picasso.with(activity)
+                    .load(artist.getSmallPicAddress())
+                    .into(artistImage);
+        }
     }
 }

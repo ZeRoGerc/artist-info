@@ -45,6 +45,16 @@
             android:layout_height="wrap_content"
             android:id="@+id/full_info_bio"
             android:layout_below="@id/full_info_bio_title"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/full_info_link"
+            android:textColor="@color/link_color"
+            android:layout_below="@id/full_info_bio"
+            android:layout_alignParentEnd="true"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"/>
     </RelativeLayout>
 
 </android.support.v4.widget.NestedScrollView>

@@ -5,7 +5,8 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 /**
- * Created by ZeRoGerc on 11/04/16.
+ * Image view with width and height equal to width from first {@link #onMeasure(int, int)}.
+ * So it just measure width and set height equal to it.
  */
 public class SquareImageView extends ImageView {
     public SquareImageView(Context context, AttributeSet attrs) {
